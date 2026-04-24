@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin System</title>
+</head>
+<body>
+    <h1>Quản lý sản phẩm</h1>
+
+    <input id="name" placeholder="Tên sản phẩm">
+    <input id="price" placeholder="Giá">
+    <input id="desc" placeholder="Mô tả">
+
+    <button onclick="addProduct()">Thêm</button>
+
+    <h2>Danh sách</h2>
+    <ul id="list"></ul>
+
+<script>
+async function loadProducts() {
+    const res = await fetch("http://localhost:3000/products");
+    const data = await res.json();
+
+    const list = document.getElementById("list");
+    list.innerHTML = "";
+
+    data.forEach(p => {
+        list.innerHTML += `
+        <li>
+            ${p.name} - ${p.price}
+            <button onclick="deleteProduct('${p._id}')">Xóa</button>
+        </li>`;
+    });
+}
+
+async function addProduct() {
+    const name = document.getElementById("name").value;
+    const price = document.getElementById("price").value;
+    const description = document.getElementById("desc").value;
+
+    await fetch("http://localhost:3000/products/add", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ name, price, description })
+    });
+
+    loadProducts();
+}
+
+async function deleteProduct(id) {
+    await fetch("http://localhost:3000/products/" + id, {
+        method: "DELETE"
+    });
+
+    loadProducts();
+}
+
+loadProducts();
+</script>
+
+</body>
+</html>
